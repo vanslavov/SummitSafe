@@ -1,7 +1,10 @@
 # SummitSafe
-Capstone Household
 
-File structure: 
+---
+
+## Repo File Structure
+
+```text
 SummitSafe/
 ├── README.md
 ├── docs/                     # Flowcharts, schematics, pinout tables
@@ -9,38 +12,35 @@ SummitSafe/
 │   ├── config.h              # Pin definitions, thresholds, timing constants
 │   └── state_types.h         # SystemState enum (POLLING, PENDING, SENDING)
 └── src/
-    ├── main.cpp (or .ino)    # setup(), loop(), and top-level Finite State Machine (FSM) - keeping this minimal and clean for ease
+    ├── main.cpp              # setup(), loop(), and top-level Finite State Machine (FSM)
     │
-    ├── drivers/              # HAL & lower-level abstraction 
+    ├── drivers/              # Hardware Abstraction Layer (HAL) - Low-level drivers
     │   ├── sensor_pulseox.h / .cpp
     │   ├── sensor_accel.h / .cpp
-    │   ├── sensor_temp.h / .cpp    
-    │   ├── gps_module.h / .cpp     
-    │   ├── rf_transmitter.h / .cpp 
+    │   ├── sensor_temp.h / .cpp    # TMP119 I2C wrapper
+    │   ├── gps_module.h / .cpp     # Adafruit PA1010D wrapper
+    │   ├── rf_transmitter.h / .cpp # RFM96W + MOSFET 5W PA control
     │   └── user_feedback.h / .cpp  # Buzzer, LEDs, Two-step button
     │
-    ├── logic/                
-    │   ├── health_monitor.h / .cpp # Is this normal behavior? evaluation
-    │   └── emergency_fsm.h / .cpp  # Manages [Polling -> Pending -> Sending] state transitions
+    ├── logic/                # Business logic & health algorithms
+    │   ├── health_monitor.h / .cpp # Evaluates "Normal behavior?" condition
+    │   └── emergency_fsm.h / .cpp  # Manages Polling -> Pending -> Sending state transitions
     │
-    └── utils/                # Power management & other helpers if needed
+    └── utils/                # Power management & helpers
         └── power_manager.h / .cpp  # ESP32 light/deep sleep routines
 
 
-
-
-Overview of sensors to code:
 [ Hardware Sensors ] (TMP119, Accelerometer, PulseOx)
         │
         ▼
-[ drivers/ ]  --> Reads raw registers and converts them to human numbers (i.e. 25098 = 37.2 °C)
+[ drivers/ ]                  --> Reads raw registers and converts to human values
         │
         ▼
-[ logic/health_monitor ] --> "are these numbers ok or not?" 
+[ logic/health_monitor ]      --> Evaluates if sensor values are normal or dangerous
         │
         ▼
-[ logic/emergency_fsm ]  --> Decides state: POLLING -> PENDING -> SENDING
+[ logic/emergency_fsm ]       --> Manages state: POLLING -> PENDING -> SENDING
         │
-        ├─► Controls [ drivers/user_feedback ] (Triggers Buzzer & LEDs in PENDING)
-        ├─► Controls [ drivers/gps_module ]   (Powers on GPS in PENDING)
+        ├─► Controls [ drivers/user_feedback ]  (Triggers Buzzer & LEDs in PENDING)
+        ├─► Controls [ drivers/gps_module ]     (Powers on GPS in PENDING)
         └─► Controls [ drivers/rf_transmitter ] (Fires 5W RF Amp in SENDING)
