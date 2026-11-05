@@ -28,7 +28,10 @@ SummitSafe/
     │
     └── utils/                # Power management & helpers
         └── power_manager.h / .cpp  # ESP32 light/deep sleep routines
+```
 
+## Sensors to code
+```text
 
 [ Hardware Sensors ] (TMP119, Accelerometer, PulseOx)
         │
@@ -44,3 +47,5 @@ SummitSafe/
         ├─► Controls [ drivers/user_feedback ]  (Triggers Buzzer & LEDs in PENDING)
         ├─► Controls [ drivers/gps_module ]     (Powers on GPS in PENDING)
         └─► Controls [ drivers/rf_transmitter ] (Fires 5W RF Amp in SENDING)
+
+
